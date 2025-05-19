@@ -42,12 +42,117 @@ Para los cuatro casos, deberá incluir una gráfica en la que se visualice clara
 añadir la información necesaria para su correcta interpretación, aunque esa información puede reducirse a
 colocar etiquetas y títulos adecuados en la propia gráfica (se valorará positivamente esta alternativa).
 
+**Respuesta**
+Se generan los cuatro instrumentos indicados usando `envolvente_adsr.orc`y `envolvente_adsr.sco`. Se automatiza el proceso de prueba y error con `envolvente_adsr.sh`.
+
+Nota: En clase se implementó más o menos el instrumento seno directamente sobre InstrumentDumb. Dado que este ejercicio iba antes que el de implementar el instrumento "seno", se acabó de implementar el instrumento "seno" en la clase InstrumentDumb, se hizo este ejercicio y más adelante se implementó "seno" en sus respectivos ficheros `cpp`. Después se revirtió InstrumentDumb a su estado original para que siguiera siendo tonto.
+
+Envolventes ADSR resultantes:
+
+Instrumento generico:
+
+![InstrumentoGenerico](img/envolvente_adsr_generico.png)
+
+Primer instrumento percusivo:
+
+![InstrumentoPercusivo1](img/envolvente_adsr_percusivo1.png)
+
+Segundo instrumento percusivo:
+
+![InstrumentoPercusivo2](img/envolvente_adsr_percusivo2.png)
+
+Instrumento plano:
+
+![InstrumentoPlano](img/envolvente_adsr_plano.png)
+
 ### Instrumentos Dumb y Seno.
 
 Implemente el instrumento `Seno` tomando como modelo el `InstrumentDumb`. La señal **deberá** formarse
 mediante búsqueda de los valores en una tabla.
 
 - Incluya, a continuación, el código del fichero `seno.cpp` con los métodos de la clase Seno.
+
+```cpp
+#include <iostream>
+#include <math.h>
+#include "seno.h"
+#include "keyvalue.h"
+
+#include <stdlib.h>
+
+using namespace upc;
+using namespace std;
+
+seno::seno(const std::string &param) 
+  : adsr(SamplingRate, param) {
+  bActive = false;
+  x.resize(BSIZE);
+
+  /*
+    You can use the class keyvalue to parse "param" and configure your instrument.
+    Take a Look at keyvalue.h    
+  */
+  KeyValue kv(param); //Los parametros definidos en dumb.orc
+  int N;
+
+  if (!kv.to_int("N",N)) // Si el fichero no incluia el parametro N, toma por defecto 40
+    N = 40; //default value
+  
+  //Create a tbl with one period of a sinusoidal wave
+  tbl.resize(N);
+  float phase = 0, step = 2 * M_PI /(float) N; 
+  index = 0;
+  for (int i=0; i < N ; ++i) {
+    tbl[i] = sin(phase);
+    phase += step;
+  }
+}
+
+
+void seno::command(long cmd, long note, long vel) {
+  if (cmd == 9) {		//'Key' pressed: attack begins
+    bActive = true;
+    adsr.start();
+    index = 0;
+	  A = vel / 127.;
+    float f0 = 440*pow(2,(note-69.)/12.);
+    phase = 2*M_PI*f0/SamplingRate;
+    phase_act = 0;
+  }
+  else if (cmd == 8) {	//'Key' released: sustain ends, release begins
+    adsr.stop();
+  }
+  else if (cmd == 0) {	//Sound extinguished without waiting for release to end
+    adsr.end();
+  }
+}
+
+
+const vector<float> & seno::synthesize() {
+  if (not adsr.active()) {
+    x.assign(x.size(), 0);
+    bActive = false;
+    return x;
+  }
+  else if (not bActive)
+    return x;
+
+  for (unsigned int i=0; i<x.size(); ++i) {
+    phase_act += phase;
+    while (phase_act>2*M_PI) {
+      phase_act -= 2*M_PI;
+    }
+    index = (int) phase_act/(2*M_PI)*tbl.size();
+    x[i] = A * tbl[index];
+    //if (index == tbl.size())
+    //  index = 0;
+  }
+  adsr(x); //apply envelope to x and update internal status of ADSR
+
+  return x;
+}
+```
+
 - Explique qué método se ha seguido para asignar un valor a la señal a partir de los contenidos en la tabla,
   e incluya una gráfica en la que se vean claramente (use pelotitas en lugar de líneas) los valores de la
   tabla y los de la señal generada.

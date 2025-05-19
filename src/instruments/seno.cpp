@@ -1,6 +1,6 @@
 #include <iostream>
 #include <math.h>
-#include "instrument_dumb.h"
+#include "seno.h"
 #include "keyvalue.h"
 
 #include <stdlib.h>
@@ -8,7 +8,7 @@
 using namespace upc;
 using namespace std;
 
-InstrumentDumb::InstrumentDumb(const std::string &param) 
+seno::seno(const std::string &param) 
   : adsr(SamplingRate, param) {
   bActive = false;
   x.resize(BSIZE);
@@ -17,15 +17,15 @@ InstrumentDumb::InstrumentDumb(const std::string &param)
     You can use the class keyvalue to parse "param" and configure your instrument.
     Take a Look at keyvalue.h    
   */
-  KeyValue kv(param);
+  KeyValue kv(param); //Los parametros definidos en dumb.orc
   int N;
 
-  if (!kv.to_int("N",N))
+  if (!kv.to_int("N",N)) // Si el fichero no incluia el parametro N, toma por defecto 40
     N = 40; //default value
   
   //Create a tbl with one period of a sinusoidal wave
   tbl.resize(N);
-  float phase = 0, step = 2 * M_PI /(float) N;
+  float phase = 0, step = 2 * M_PI /(float) N; 
   index = 0;
   for (int i=0; i < N ; ++i) {
     tbl[i] = sin(phase);
@@ -34,12 +34,15 @@ InstrumentDumb::InstrumentDumb(const std::string &param)
 }
 
 
-void InstrumentDumb::command(long cmd, long note, long vel) {
+void seno::command(long cmd, long note, long vel) {
   if (cmd == 9) {		//'Key' pressed: attack begins
     bActive = true;
     adsr.start();
     index = 0;
-	A = vel / 127.;
+	  A = vel / 127.;
+    float f0 = 440*pow(2,(note-69.)/12.);
+    phase = 2*M_PI*f0/SamplingRate;
+    phase_act = 0;
   }
   else if (cmd == 8) {	//'Key' released: sustain ends, release begins
     adsr.stop();
@@ -50,7 +53,7 @@ void InstrumentDumb::command(long cmd, long note, long vel) {
 }
 
 
-const vector<float> & InstrumentDumb::synthesize() {
+const vector<float> & seno::synthesize() {
   if (not adsr.active()) {
     x.assign(x.size(), 0);
     bActive = false;
@@ -60,9 +63,14 @@ const vector<float> & InstrumentDumb::synthesize() {
     return x;
 
   for (unsigned int i=0; i<x.size(); ++i) {
-    x[i] = A * tbl[index++];
-    if (index == tbl.size())
-      index = 0;
+    phase_act += phase;
+    while (phase_act>2*M_PI) {
+      phase_act -= 2*M_PI;
+    }
+    index = (int) phase_act/(2*M_PI)*tbl.size();
+    x[i] = A * tbl[index];
+    //if (index == tbl.size())
+    //  index = 0;
   }
   adsr(x); //apply envelope to x and update internal status of ADSR
 
