@@ -140,6 +140,11 @@ const vector<float> & seno::synthesize() {
 - Explique qué método se ha seguido para asignar un valor a la señal a partir de los contenidos en la tabla,
   e incluya una gráfica en la que se vean claramente (use pelotitas en lugar de líneas) los valores de la
   tabla y los de la señal generada.
+
+**Respuesta:** El instrumento seno funciona de la siguiente forma: Se muestrea un periodo de la señal sinusoidal y se guarda en una look-up-table tabla con N muestras. A continuación ese periodo registrado en la tabla se puede recorrer más rápido o más lento, de tal forma que se pueden generar notas más agudas, o más graves, según sea conveniente.
+
+![SenoMuestreo](img/SenoMuestreo.png)
+
 - Si ha implementado la síntesis por tabla almacenada en fichero externo, incluya a continuación el código
   del método `command()`.
 
