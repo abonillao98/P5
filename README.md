@@ -154,6 +154,17 @@ const vector<float> & seno::synthesize() {
   sinusoidal. Deberá explicar detalladamente cómo se manifiestan los parámetros del efecto (frecuencia e
   índice de modulación) en la señal generada (se valorará que la explicación esté contenida en las propias
   gráficas, sin necesidad de *literatura*).
+
+**Respuesta:** Ficheros de trabajo para este apartado ubicados en `work/ej_efectos`
+
+Seno plano vs Seno con tremolo A=0.6 fm=24
+
+![senoPlano_vs_senoTremolo](img/senoPlano_vs_senoTremolo.png)
+
+Seno plano vs Seno con vibrato I=0.6 fm=6
+
+![senoPlano_vs_senoVibrato](img/senoPlano_vs_senoVibrato.png)
+
 - Si ha generado algún efecto por su cuenta, explique en qué consiste, cómo lo ha implementado y qué
   resultado ha producido. Incluya, en el directorio `work/ejemplos`, los ficheros necesarios para apreciar
   el efecto, e indique, a continuación, la orden necesaria para generar los ficheros de audio usando el
