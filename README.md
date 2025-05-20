@@ -43,27 +43,11 @@ añadir la información necesaria para su correcta interpretación, aunque esa i
 colocar etiquetas y títulos adecuados en la propia gráfica (se valorará positivamente esta alternativa).
 
 **Respuesta**
-Se generan los cuatro instrumentos indicados usando `envolvente_adsr.orc`y `envolvente_adsr.sco`. Se automatiza el proceso de prueba y error con `envolvente_adsr.sh`.
-
-Nota: En clase se implementó más o menos el instrumento seno directamente sobre InstrumentDumb. Dado que este ejercicio iba antes que el de implementar el instrumento "seno", se acabó de implementar el instrumento "seno" en la clase InstrumentDumb, se hizo este ejercicio y más adelante se implementó "seno" en sus respectivos ficheros `cpp`. Después se revirtió InstrumentDumb a su estado original para que siguiera siendo tonto.
+Se genera una muestras de los cuatro instrumentos usando `generico.orc`, `percusivo1.orc`, `percusivo2.orc` y `plano.orc`, generando sendos ficheros `.wav`. Gráfico generado usando el script `work/ejercicio_envolvente_adsr/grafico_todos.py`.
 
 Envolventes ADSR resultantes:
 
-Instrumento generico:
-
-![InstrumentoGenerico](img/envolvente_adsr_generico.png)
-
-Primer instrumento percusivo:
-
-![InstrumentoPercusivo1](img/envolvente_adsr_percusivo1.png)
-
-Segundo instrumento percusivo:
-
-![InstrumentoPercusivo2](img/envolvente_adsr_percusivo2.png)
-
-Instrumento plano:
-
-![InstrumentoPlano](img/envolvente_adsr_plano.png)
+![EnvolventeAdsrTdos](img/envolvente_adsr_todos.png)
 
 ### Instrumentos Dumb y Seno.
 
